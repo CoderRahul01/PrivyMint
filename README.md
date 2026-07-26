@@ -58,6 +58,17 @@ High-value NFTs (Cryptopunks, rare metaverse land, fine art, tokenized real-worl
 
 ---
 
+## 🔒 Privacy Claim
+
+An on-chain observer or block explorer sees **only public ledger state**: aggregate sold share counts, unit price in DUST, and total issued supply. An observer **cannot see**:
+1. Which investor wallet address purchased shares.
+2. How many fractional shares an individual investor holds.
+3. Total portfolio valuation or transaction history.
+
+When an investor proves co-ownership via `disclose()`, the on-chain verifier confirms that the investor holds $\ge N$ shares without revealing the investor's wallet address or actual balance.
+
+---
+
 ## 🏗️ Tech Stack & Prerequisites
 
 ### Tech Stack
