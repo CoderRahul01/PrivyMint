@@ -1,0 +1,247 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PrivyMint Global Design System
+   Dark mode first — purple + midnight blue glassmorphism aesthetic
+───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --color-bg:          #0f172a;
+  --color-surface:     #1e1b4b;
+  --color-brand:       #8b5cf6;
+  --color-brand-light: #a78bfa;
+  --color-brand-dark:  #6d28d9;
+  --color-text:        #f8fafc;
+  --color-muted:       #94a3b8;
+  --color-border:      rgba(255, 255, 255, 0.08);
+  --radius-card:       16px;
+  --blur-glass:        12px;
+}
+
+/* ─── Base Resets ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(76, 29, 149, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(45, 68, 238, 0.3) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: var(--color-text);
+  font-family: var(--font-outfit), system-ui, sans-serif;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.4);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
+}
+
+/* ─── Typography ─── */
+.heading-hero {
+  @apply text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight;
+  background: linear-gradient(135deg, #f8fafc 0%, #a78bfa 60%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heading-xl {
+  @apply text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight;
+}
+
+.heading-lg {
+  @apply text-2xl sm:text-3xl font-bold;
+}
+
+.heading-md {
+  @apply text-xl font-semibold;
+}
+
+/* ─── Glassmorphism Cards ─── */
+.glass-card {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.glass-card-hover {
+  @apply glass-card transition-all duration-300;
+}
+
+.glass-card-hover:hover {
+  background: rgba(15, 23, 42, 0.75);
+  border-color: rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+}
+
+/* ─── Gradient Borders ─── */
+.gradient-border {
+  position: relative;
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: var(--radius-card);
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.6), rgba(45, 68, 238, 0.3), transparent);
+  border-radius: inherit;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ─── Buttons ─── */
+.btn-primary {
+  @apply inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200;
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.6);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  @apply inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #a78bfa;
+}
+
+.btn-secondary:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.btn-ghost {
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 text-slate-400;
+}
+
+.btn-ghost:hover {
+  @apply text-white bg-white/5;
+}
+
+/* ─── Badge ─── */
+.badge {
+  @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium;
+}
+
+.badge-active {
+  @apply badge bg-emerald-500/15 text-emerald-400 border border-emerald-500/25;
+}
+
+.badge-sold-out {
+  @apply badge bg-amber-500/15 text-amber-400 border border-amber-500/25;
+}
+
+.badge-cancelled {
+  @apply badge bg-red-500/15 text-red-400 border border-red-500/25;
+}
+
+.badge-closed {
+  @apply badge bg-slate-500/15 text-slate-400 border border-slate-500/25;
+}
+
+.badge-privacy {
+  @apply badge bg-brand-500/15 text-brand-400 border border-brand-500/25;
+}
+
+/* ─── Input Fields ─── */
+.input-field {
+  @apply w-full px-4 py-3 rounded-xl text-white placeholder-slate-500 transition-all duration-200;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+/* ─── Progress Bar ─── */
+.progress-bar {
+  @apply w-full h-2 rounded-full overflow-hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.progress-fill {
+  @apply h-full rounded-full transition-all duration-700;
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+}
+
+/* ─── ZK Shield Animation ─── */
+.zk-shield {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* ─── Skeleton Loading ─── */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s linear infinite;
+  border-radius: 8px;
+}
+
+/* ─── Section Divider ─── */
+.section-glow {
+  position: relative;
+}
+
+.section-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.5), transparent);
+}
+
+/* ─── Noise Texture Overlay (Subtle) ─── */
+.noise {
+  position: relative;
+}
+
+.noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  border-radius: inherit;
+}
