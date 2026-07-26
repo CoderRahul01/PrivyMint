@@ -1,0 +1,33 @@
+{
+  "name": "privymint",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PrivyMint — Privacy-first NFT fractionalization platform built on Midnight Network",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=apps/web",
+    "build": "npm run build --workspace=apps/web",
+    "dev:api": "npm run dev --workspace=apps/api",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "contract:compile": "compact build contracts/privymint.compact",
+    "contract:check": "compact compile contracts/privymint.compact"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "midnight",
+    "nft",
+    "fractionalization",
+    "zero-knowledge",
+    "privacy",
+    "web3",
+    "compact"
+  ],
+  "author": "PrivyMint Team",
+  "license": "MIT"
+}
