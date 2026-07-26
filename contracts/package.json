@@ -1,0 +1,13 @@
+{
+  "name": "@privymint/contracts",
+  "version": "1.0.0",
+  "description": "Midnight Compact ZK smart contracts for PrivyMint platform",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "compact compile privymint.compact build/ && compact compile privymint.compact managed/",
+    "compile": "compact compile privymint.compact build/"
+  },
+  "dependencies": {
+    "@midnight-ntwrk/midnight-js-protocol": "^0.14.0"
+  }
+}
