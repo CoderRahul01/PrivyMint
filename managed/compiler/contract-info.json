@@ -1,0 +1,322 @@
+{
+  "compiler-version": "0.31.1",
+  "language-version": "0.23.0",
+  "runtime-version": "0.16.0",
+  "circuits": [
+    {
+      "name": "createFraction",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "metadataHashBytes",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "totalShares",
+          "type": {
+            "type-name": "Field"
+          }
+        },
+        {
+          "name": "sharePrice",
+          "type": {
+            "type-name": "Field"
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Field"
+      }
+    },
+    {
+      "name": "buyShares",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "offeringId",
+          "type": {
+            "type-name": "Field"
+          }
+        },
+        {
+          "name": "sharesToBuy",
+          "type": {
+            "type-name": "Field"
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "sellShares",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "offeringId",
+          "type": {
+            "type-name": "Field"
+          }
+        },
+        {
+          "name": "sharesToSell",
+          "type": {
+            "type-name": "Field"
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "transferShares",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "offeringId",
+          "type": {
+            "type-name": "Field"
+          }
+        },
+        {
+          "name": "sharesToTransfer",
+          "type": {
+            "type-name": "Field"
+          }
+        },
+        {
+          "name": "recipientCommitment",
+          "type": {
+            "type-name": "Field"
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "claimOwnership",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "offeringId",
+          "type": {
+            "type-name": "Field"
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "verifyOwnership",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "offeringId",
+          "type": {
+            "type-name": "Field"
+          }
+        },
+        {
+          "name": "minimumShares",
+          "type": {
+            "type-name": "Field"
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Boolean"
+      }
+    },
+    {
+      "name": "cancelOffering",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "offeringId",
+          "type": {
+            "type-name": "Field"
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "closeOffering",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "offeringId",
+          "type": {
+            "type-name": "Field"
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    }
+  ],
+  "witnesses": [
+    {
+      "name": "localShareBalance",
+      "arguments": [
+        {
+          "name": "offeringId",
+          "type": {
+            "type-name": "Field"
+          }
+        }
+      ],
+      "result type": {
+        "type-name": "Field"
+      }
+    },
+    {
+      "name": "sessionNonce",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Field"
+      }
+    },
+    {
+      "name": "investorCommitment",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Field"
+      }
+    },
+    {
+      "name": "creatorCommitment",
+      "arguments": [
+        {
+          "name": "offeringId",
+          "type": {
+            "type-name": "Field"
+          }
+        }
+      ],
+      "result type": {
+        "type-name": "Field"
+      }
+    }
+  ],
+  "contracts": [
+  ],
+  "ledger": [
+    {
+      "name": "offeringCount",
+      "index": 0,
+      "exported": true,
+      "storage": "Cell",
+      "type": {
+        "type-name": "Field"
+      }
+    },
+    {
+      "name": "offeringMetadataHash",
+      "index": 1,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Field"
+      },
+      "value": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "offeringTotalShares",
+      "index": 2,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Field"
+      },
+      "value": {
+        "type-name": "Field"
+      }
+    },
+    {
+      "name": "offeringSharePrice",
+      "index": 3,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Field"
+      },
+      "value": {
+        "type-name": "Field"
+      }
+    },
+    {
+      "name": "offeringStatus",
+      "index": 4,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Field"
+      },
+      "value": {
+        "type-name": "Field"
+      }
+    },
+    {
+      "name": "offeringSoldShares",
+      "index": 5,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Field"
+      },
+      "value": {
+        "type-name": "Field"
+      }
+    },
+    {
+      "name": "offeringCreatorCommitment",
+      "index": 6,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Field"
+      },
+      "value": {
+        "type-name": "Field"
+      }
+    }
+  ]
+}
