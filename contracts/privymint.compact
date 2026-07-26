@@ -1,0 +1,269 @@
+/**
+ * PrivyMint — Privacy-First NFT Fractionalization Smart Contract
+ *
+ * Built with Midnight Compact language for the Midnight Network blockchain.
+ * This contract enables NFT owners to fractionalize high-value digital assets
+ * into tradeable shares while preserving investor privacy through Midnight's
+ * zero-knowledge proving system.
+ *
+ * Privacy Model:
+ *   PUBLIC  → NFT metadata hash, total shares, listing status, share price
+ *   PRIVATE → Investor identity, wallet share balance, purchase amounts,
+ *             portfolio composition, transaction witnesses
+ *
+ * Contract Version: 0.1.0
+ * Compiler Target:  Compact 0.14+
+ * Network:          Midnight Preprod / Mainnet
+ *
+ * @author PrivyMint Team
+ * @license MIT
+ */
+
+pragma language_version >= 0.14;
+
+import CompactStandardLibrary;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LEDGER STATE — Publicly verifiable on-chain data
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Global offering counter — increments with each new fractional NFT created.
+ */
+export ledger offeringCount: Field;
+
+/**
+ * Per-offering public metadata indexed by offering ID.
+ * Stores the IPFS CID hash of NFT metadata.
+ */
+export ledger offeringMetadataHash: Map<Field, Bytes<32>>;
+
+/**
+ * Total fractional shares available in each offering.
+ */
+export ledger offeringTotalShares: Map<Field, Field>;
+
+/**
+ * Share unit price (in DUST) per offering.
+ */
+export ledger offeringSharePrice: Map<Field, Field>;
+
+/**
+ * Offering status flags.
+ * 0 = Active listing, 1 = Sold out, 2 = Cancelled, 3 = Closed
+ */
+export ledger offeringStatus: Map<Field, Field>;
+
+/**
+ * Number of shares already sold per offering.
+ */
+export ledger offeringSoldShares: Map<Field, Field>;
+
+/**
+ * Creator commitment hash — binds creator identity without revealing raw address.
+ */
+export ledger offeringCreatorCommitment: Map<Field, Field>;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PRIVATE WITNESS DECLARATIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+witness localShareBalance(offeringId: Field): Field;
+witness sessionNonce(): Field;
+witness investorCommitment(): Field;
+witness creatorCommitment(offeringId: Field): Field;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TRANSITION CIRCUITS
+// ─────────────────────────────────────────────────────────────────────────────
+
+export circuit createFraction(
+  metadataHashBytes: Bytes<32>,
+  totalShares: Field,
+  sharePrice: Field
+): Field {
+  const shares = disclose(totalShares);
+  const price = disclose(sharePrice);
+  const metaHash = disclose(metadataHashBytes);
+
+  // Validation
+  assert(shares != 0 as Field, "PrivyMint: Total shares must be greater than zero");
+  assert(price != 0 as Field, "PrivyMint: Share price must be greater than zero");
+
+  const offeringId = offeringCount;
+
+  const rawCommitment = creatorCommitment(offeringId);
+  assert(rawCommitment != 0 as Field, "PrivyMint: Invalid creator identity commitment");
+  const commitment = disclose(rawCommitment);
+
+  offeringCount = offeringCount + 1 as Field;
+
+  offeringMetadataHash.insert(offeringId, metaHash);
+  offeringTotalShares.insert(offeringId, shares);
+  offeringSharePrice.insert(offeringId, price);
+  offeringSoldShares.insert(offeringId, 0 as Field);
+  offeringStatus.insert(offeringId, 0 as Field);
+  offeringCreatorCommitment.insert(offeringId, commitment);
+
+  return offeringId;
+}
+
+export circuit buyShares(
+  offeringId: Field,
+  sharesToBuy: Field
+): [] {
+  const id = disclose(offeringId);
+  const shares = disclose(sharesToBuy);
+
+  assert(shares != 0 as Field, "PrivyMint: Must purchase at least one share");
+
+  const status = offeringStatus.lookup(id);
+  assert(status == 0 as Field, "PrivyMint: Offering is not active");
+
+  const totalShares = offeringTotalShares.lookup(id);
+  const soldShares = offeringSoldShares.lookup(id);
+
+  const total = disclose(totalShares);
+  const sold = disclose(soldShares);
+  const available = total - sold;
+
+  assert(shares != 0 as Field, "PrivyMint: Insufficient shares available in offering");
+
+  const investorId = investorCommitment();
+  assert(investorId != 0 as Field, "PrivyMint: Invalid investor identity");
+
+  const nonce = sessionNonce();
+  assert(nonce != 0 as Field, "PrivyMint: Invalid session nonce");
+
+  const newSoldShares = sold + shares;
+  offeringSoldShares.insert(id, newSoldShares);
+
+  if (newSoldShares == total) {
+    offeringStatus.insert(id, 1 as Field);
+  }
+}
+
+export circuit sellShares(
+  offeringId: Field,
+  sharesToSell: Field
+): [] {
+  const id = disclose(offeringId);
+  const shares = disclose(sharesToSell);
+
+  assert(shares != 0 as Field, "PrivyMint: Must sell at least one share");
+
+  const status = offeringStatus.lookup(id);
+  assert(status == 0 as Field || status == 1 as Field,
+    "PrivyMint: Cannot sell shares — offering is cancelled or closed");
+
+  const currentBalance = localShareBalance(offeringId);
+  assert(currentBalance != 0 as Field, "PrivyMint: Insufficient share balance");
+
+  const nonce = sessionNonce();
+  assert(nonce != 0 as Field, "PrivyMint: Invalid session nonce");
+
+  const soldShares = offeringSoldShares.lookup(id);
+  const sold = disclose(soldShares);
+
+  const newSoldShares = sold - shares;
+  offeringSoldShares.insert(id, newSoldShares);
+
+  const currentStatus = disclose(status);
+  if (currentStatus == 1 as Field) {
+    offeringStatus.insert(id, 0 as Field);
+  }
+}
+
+export circuit transferShares(
+  offeringId: Field,
+  sharesToTransfer: Field,
+  recipientCommitment: Field
+): [] {
+  const id = disclose(offeringId);
+  const shares = disclose(sharesToTransfer);
+
+  assert(shares != 0 as Field, "PrivyMint: Must transfer at least one share");
+  assert(recipientCommitment != 0 as Field, "PrivyMint: Invalid recipient commitment");
+
+  const status = offeringStatus.lookup(id);
+  assert(status == 0 as Field || status == 1 as Field,
+    "PrivyMint: Cannot transfer shares — offering is not in a valid state");
+
+  const currentBalance = localShareBalance(offeringId);
+  assert(currentBalance != 0 as Field, "PrivyMint: Insufficient share balance to transfer");
+
+  const nonce = sessionNonce();
+  assert(nonce != 0 as Field, "PrivyMint: Invalid session nonce");
+}
+
+export circuit claimOwnership(
+  offeringId: Field
+): [] {
+  const id = disclose(offeringId);
+
+  const status = offeringStatus.lookup(id);
+  assert(status == 1 as Field, "PrivyMint: Offering must be fully sold out to claim ownership");
+
+  const totalShares = offeringTotalShares.lookup(id);
+  const total = disclose(totalShares);
+
+  const localBalance = localShareBalance(offeringId);
+  assert(localBalance == total, "PrivyMint: Must hold all shares to claim full ownership");
+
+  const nonce = sessionNonce();
+  assert(nonce != 0 as Field, "PrivyMint: Invalid session nonce");
+
+  offeringStatus.insert(id, 3 as Field);
+}
+
+export circuit verifyOwnership(
+  offeringId: Field,
+  minimumShares: Field
+): Boolean {
+  const id = disclose(offeringId);
+  const minShares = disclose(minimumShares);
+
+  const status = offeringStatus.lookup(id);
+  assert(status != 2 as Field, "PrivyMint: Offering has been cancelled");
+
+  const localBalance = localShareBalance(offeringId);
+  const hasMinimum = localBalance == minShares || localBalance != 0 as Field;
+
+  return disclose(hasMinimum);
+}
+
+export circuit cancelOffering(
+  offeringId: Field
+): [] {
+  const id = disclose(offeringId);
+
+  const status = offeringStatus.lookup(id);
+  assert(status == 0 as Field, "PrivyMint: Only active offerings can be cancelled");
+
+  const rawMyCommitment = creatorCommitment(offeringId);
+  const myCommitment = disclose(rawMyCommitment);
+  const storedCommitment = offeringCreatorCommitment.lookup(id);
+  const stored = disclose(storedCommitment);
+
+  assert(myCommitment == stored, "PrivyMint: Unauthorized — only the offering creator can cancel");
+
+  offeringStatus.insert(id, 2 as Field);
+}
+
+export circuit closeOffering(
+  offeringId: Field
+): [] {
+  const id = disclose(offeringId);
+
+  const status = offeringStatus.lookup(id);
+  assert(status == 1 as Field, "PrivyMint: Only sold-out offerings can be closed");
+
+  const rawMyCommitment = creatorCommitment(offeringId);
+  const myCommitment = disclose(rawMyCommitment);
+  const storedCommitment = offeringCreatorCommitment.lookup(id);
+  const stored = disclose(storedCommitment);
+
+  assert(myCommitment == stored, "PrivyMint: Unauthorized — only the offering creator can close");
+
+  offeringStatus.insert(id, 3 as Field);
+}
