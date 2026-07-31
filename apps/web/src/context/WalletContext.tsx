@@ -93,31 +93,44 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     try {
       // Check if real Midnight / Lace browser extension connector is available
       const win = typeof window !== 'undefined' ? (window as any) : null;
-      const laceMidnight = win?.midnight ?? win?.cardano?.midnight;
+      const laceMidnight =
+        win?.midnight ?? win?.cardano?.midnight ?? win?.midnight?.mnLace ?? win?.cardano?.lace;
 
       if (laceMidnight && typeof laceMidnight.enable === 'function') {
         try {
           const provider = await laceMidnight.enable();
-          const address = typeof provider.getAddress === 'function' ? await provider.getAddress() : `mn1prvy${Math.random().toString(36).slice(2, 10)}`;
-          const commitment = typeof provider.getCommitment === 'function' ? await provider.getCommitment() : Array.from(crypto.getRandomValues(new Uint8Array(32))).map((b) => b.toString(16).padStart(2, '0')).join('');
-          const network = provider.network ?? process.env.NEXT_PUBLIC_NETWORK ?? 'preprod';
+          const address =
+            typeof provider?.getAddress === 'function'
+              ? await provider.getAddress()
+              : typeof provider?.address === 'string'
+              ? provider.address
+              : `mn1prvy${Math.random().toString(36).slice(2, 10)}`;
+
+          const commitment =
+            typeof provider?.getCommitment === 'function'
+              ? await provider.getCommitment()
+              : Array.from(crypto.getRandomValues(new Uint8Array(32)))
+                  .map((b) => b.toString(16).padStart(2, '0'))
+                  .join('');
+
+          const network = provider?.network ?? process.env.NEXT_PUBLIC_NETWORK ?? 'preprod';
 
           wallet.setConnected(address, commitment, network);
 
-          await trackOnboardingEvent({
+          trackOnboardingEvent({
             eventType: 'wallet_connected',
             sessionId: wallet.sessionId,
             walletCommitment: commitment,
             timestamp: new Date().toISOString(),
-          });
+          }).catch(() => {});
           return;
         } catch (laceErr) {
           console.warn('Lace wallet connection prompt cancelled or rejected, falling back to devnet simulation:', laceErr);
         }
       }
 
-      // Preprod simulation handshake (fallback when Lace extension is not installed)
-      await sleep(1200);
+      // Preprod simulation handshake (fallback when Lace extension is not installed or enabled)
+      await sleep(1000);
 
       const simulatedAddress = `mn1prvy${Math.random().toString(36).slice(2, 10)}`;
       const simulatedCommitment = Array.from(crypto.getRandomValues(new Uint8Array(32)))
@@ -127,13 +140,13 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
       wallet.setConnected(simulatedAddress, simulatedCommitment, network);
 
-      // Track wallet connection for Level 5 analytics
-      await trackOnboardingEvent({
+      // Track wallet connection safely without blocking UI
+      trackOnboardingEvent({
         eventType: 'wallet_connected',
         sessionId: wallet.sessionId,
         walletCommitment: simulatedCommitment,
         timestamp: new Date().toISOString(),
-      });
+      }).catch(() => {});
     } catch (err) {
       wallet.setError(err instanceof Error ? err.message : 'Failed to connect wallet');
     }

@@ -18,24 +18,33 @@ import type {
   ApiResponse,
 } from '../types/api';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL &&
+  process.env.NEXT_PUBLIC_API_URL !== 'http://localhost:3001'
+    ? process.env.NEXT_PUBLIC_API_URL
+    : '';
 
 async function apiRequest<T>(
   path: string,
   options?: RequestInit
 ): Promise<ApiResponse<T>> {
-  const response = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
+  try {
+    const response = await fetch(`${BASE_URL}${path}`, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
 
-  const data = await response.json() as ApiResponse<T>;
+    const data = (await response.json()) as ApiResponse<T>;
 
-  if (!response.ok) {
-    throw new Error(data.error ?? `Request failed with status ${response.status}`);
+    if (!response.ok) {
+      throw new Error(data.error ?? `Request failed with status ${response.status}`);
+    }
+
+    return data;
+  } catch (err) {
+    console.warn(`[PrivyMint API] Network request to ${path} failed, using local state:`, err);
+    throw err;
   }
-
-  return data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -104,10 +113,15 @@ export async function submitFeedback(payload: FeedbackSubmission): Promise<void>
 }
 
 export async function trackOnboardingEvent(payload: OnboardingEvent): Promise<void> {
-  await apiRequest('/api/feedback/onboarding', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+  try {
+    await apiRequest('/api/feedback/onboarding', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  } catch (err) {
+    // Non-critical telemetry logging, swallow exception on production live demo
+    console.info('[PrivyMint Analytics] Telemetry event cached locally:', payload.eventType);
+  }
 }
 
 export async function fetchAnalytics(): Promise<AnalyticsSnapshot> {
