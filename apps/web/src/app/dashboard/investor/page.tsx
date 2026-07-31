@@ -216,14 +216,14 @@ export default function InvestorDashboardPage() {
               <span className="badge-active">BUY_SHARES</span>
               <span>Celestial Apex #001</span>
               <span>1,200</span>
-              <span>60,000,000 ꜩ</span>
+              <span>60,000,000 tDUST</span>
               <span className="text-emerald-400 font-mono">ZK Verified</span>
             </div>
             <div className="flex items-center justify-between text-xs text-slate-200 py-2">
               <span className="badge-active">BUY_SHARES</span>
               <span>Shadow Realm Land #0047</span>
               <span>450</span>
-              <span>54,000,000 ꜩ</span>
+              <span>54,000,000 tDUST</span>
               <span className="text-emerald-400 font-mono">ZK Verified</span>
             </div>
           </div>
