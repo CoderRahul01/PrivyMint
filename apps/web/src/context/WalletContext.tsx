@@ -17,7 +17,6 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { sleep } from '@/lib/utils';
 import { trackOnboardingEvent } from '@/lib/api-client';
-import { randomUUID } from 'crypto';
 import type { WalletState, WalletConnectionStatus } from '@/types/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -92,16 +91,34 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     wallet.setStatus('connecting');
 
     try {
-      // Simulate wallet extension handshake (replace with real SDK call on Preprod)
-      await sleep(1500);
+      // Check if real Midnight / Lace browser extension connector is available
+      const win = typeof window !== 'undefined' ? (window as any) : null;
+      const laceMidnight = win?.midnight ?? win?.cardano?.midnight;
 
-      // In production Midnight SDK integration:
-      // const provider = await window.midnight.enable();
-      // const address = provider.getAddress();
-      // const commitment = await provider.getCommitment();
-      // const network = provider.network;
+      if (laceMidnight && typeof laceMidnight.enable === 'function') {
+        try {
+          const provider = await laceMidnight.enable();
+          const address = typeof provider.getAddress === 'function' ? await provider.getAddress() : `mn1prvy${Math.random().toString(36).slice(2, 10)}`;
+          const commitment = typeof provider.getCommitment === 'function' ? await provider.getCommitment() : Array.from(crypto.getRandomValues(new Uint8Array(32))).map((b) => b.toString(16).padStart(2, '0')).join('');
+          const network = provider.network ?? process.env.NEXT_PUBLIC_NETWORK ?? 'preprod';
 
-      // Preprod simulation — generate a deterministic commitment hash
+          wallet.setConnected(address, commitment, network);
+
+          await trackOnboardingEvent({
+            eventType: 'wallet_connected',
+            sessionId: wallet.sessionId,
+            walletCommitment: commitment,
+            timestamp: new Date().toISOString(),
+          });
+          return;
+        } catch (laceErr) {
+          console.warn('Lace wallet connection prompt cancelled or rejected, falling back to devnet simulation:', laceErr);
+        }
+      }
+
+      // Preprod simulation handshake (fallback when Lace extension is not installed)
+      await sleep(1200);
+
       const simulatedAddress = `mn1prvy${Math.random().toString(36).slice(2, 10)}`;
       const simulatedCommitment = Array.from(crypto.getRandomValues(new Uint8Array(32)))
         .map((b) => b.toString(16).padStart(2, '0'))

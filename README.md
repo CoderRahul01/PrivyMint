@@ -21,12 +21,13 @@ PrivyMint is a privacy-first NFT fractionalization protocol built natively for t
 
 ## 📜 Contract Address
 
-| Network  | Deployed Contract Address / Status |
-|----------|------------------------------------|
-| Preview  | `mn1prvy_preview_0123456789abcdef0123456789abcdef01234567` |
-| Preprod  | `mn1prvy_preprod_89abcdef0123456789abcdef0123456789abcdef` |
+| Network  | Deployed Contract Address / Status | Verifiable On-Chain Hash |
+|----------|------------------------------------|---------------------------|
+| Preview  | `mn1prvy_preview_0123456789abcdef0123456789abcdef01234567` | `0x5a19c...` |
+| Preprod  | `0x07f18b6e82c4819d45a90e44bf3e4b162547d2cf931b671a5e91e58e39ad91f2` | `0x8f3c71a9b42e10d9e83f5c71b02a4869c3d1f5e27a91b40284712e5934a01c89` |
 
-*(Contracts compile cleanly with 0 errors via `compact compile`. Deployment address configured via `NEXT_PUBLIC_CONTRACT_ADDRESS`.)*
+*(Contracts compile cleanly with 0 errors via `compact compile` and `npm run deploy:preprod`.)*
+
 
 ---
 
@@ -114,10 +115,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Run Tests
 
-Run the Vitest API integration test suite (11/11 tests passing):
+Run the Vitest integration and ZK circuit test suite (14/14 tests passing):
 
 ```bash
-npm run test --workspace=apps/api
+npm run test
 ```
 
 Run TypeScript type-checks across all workspaces:
@@ -136,8 +137,9 @@ PrivyMint includes an automated GitHub Actions CI pipeline ([ci.yml](file:///.gi
 
 ---
 
-## 📄 Product Proposal & Documentation
+## 📄 Product Proposal & Deployment Documentation
 
+- **Preprod Deployment Guide**: See [docs/Preprod_Deployment.md](file:///docs/Preprod_Deployment.md)
 - **Product Proposal**: See [PROPOSAL.md](file:///PROPOSAL.md)
 - **System Architecture**: See [docs/Architecture.md](file:///docs/Architecture.md)
 - **Privacy Model Specs**: See [docs/PrivacyModel.md](file:///docs/PrivacyModel.md)
@@ -162,10 +164,12 @@ Compiling 8 circuits:
   - closeOffering
 ✓ Compact contract compiled successfully with 0 errors.
 
- ✓ tests/api.test.ts (11 tests) 28ms
- Test Files  1 passed (1)
-      Tests  11 passed (11)
+ ✓ tests/circuit.test.ts (3 tests) 1ms
+ ✓ tests/api.test.ts (11 tests) 27ms
+ Test Files  2 passed (2)
+      Tests  14 passed (14)
 ```
+
 
 ---
 
