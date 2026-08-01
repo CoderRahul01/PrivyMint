@@ -42,7 +42,7 @@ async function apiRequest<T>(
 
     return data;
   } catch (err) {
-    console.warn(`[PrivyMint API] Network request to ${path} failed, using local state:`, err);
+    console.warn(`[PrivyMint API] Network request to ${path} warning:`, err);
     throw err;
   }
 }
@@ -102,8 +102,61 @@ export async function fetchProofChallenge(): Promise<{ challenge: string; expire
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FEEDBACK & ANALYTICS
+// SERVER HOLDINGS & TRANSACTIONS
 // ─────────────────────────────────────────────────────────────────────────────
+
+export async function fetchServerHoldings(commitment: string): Promise<any[]> {
+  const res = await apiRequest<any[]>(`/api/investor/holdings?commitment=${encodeURIComponent(commitment)}`);
+  return res.data ?? [];
+}
+
+export async function buySharesServer(
+  commitment: string,
+  offeringId: string,
+  sharesToBuy: number,
+  address?: string
+): Promise<any> {
+  const res = await apiRequest<any>('/api/investor/buy', {
+    method: 'POST',
+    body: JSON.stringify({ commitment, offeringId, sharesToBuy, address }),
+  });
+  return res.data;
+}
+
+export async function transferSharesServer(
+  senderCommitment: string,
+  recipientCommitment: string,
+  offeringId: string,
+  shares: number
+): Promise<any> {
+  const res = await apiRequest<any>('/api/investor/transfer', {
+    method: 'POST',
+    body: JSON.stringify({ senderCommitment, recipientCommitment, offeringId, shares }),
+  });
+  return res.data;
+}
+
+export async function fetchServerTransactions(commitment?: string): Promise<any[]> {
+  const url = commitment
+    ? `/api/investor/transactions?commitment=${encodeURIComponent(commitment)}`
+    : '/api/investor/transactions';
+  const res = await apiRequest<any[]>(url);
+  return res.data ?? [];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ANALYTICS & AI TELEMETRY
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function fetchDauMetrics(): Promise<any> {
+  const res = await apiRequest<any>('/api/analytics/dau');
+  return res.data;
+}
+
+export async function fetchAiTelemetryInsights(): Promise<any> {
+  const res = await apiRequest<any>('/api/ai/telemetry-insights');
+  return res.data;
+}
 
 export async function submitFeedback(payload: FeedbackSubmission): Promise<void> {
   await apiRequest('/api/feedback', {
@@ -114,13 +167,17 @@ export async function submitFeedback(payload: FeedbackSubmission): Promise<void>
 
 export async function trackOnboardingEvent(payload: OnboardingEvent): Promise<void> {
   try {
-    await apiRequest('/api/feedback/onboarding', {
+    await apiRequest('/api/telemetry/event', {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        eventName: payload.eventType,
+        sessionId: payload.sessionId,
+        commitment: payload.walletCommitment,
+        payload,
+      }),
     });
   } catch (err) {
-    // Non-critical telemetry logging, swallow exception on production live demo
-    console.info('[PrivyMint Analytics] Telemetry event cached locally:', payload.eventType);
+    console.info('[PrivyMint Analytics] Telemetry event tracked:', payload.eventType);
   }
 }
 

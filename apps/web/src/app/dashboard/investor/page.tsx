@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -15,45 +15,40 @@ import {
   Download,
   Copy,
   Check,
+  Send,
+  RefreshCw,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
+import { TransferModal } from '@/components/ui/TransferModal';
 import { useWallet } from '@/context/WalletContext';
+import { useWitnessStore, type PrivateHolding } from '@/context/WitnessStore';
 import { formatDust, formatPercent, truncateHex } from '@/lib/utils';
 
 export default function InvestorDashboardPage() {
   const { wallet, connectWallet } = useWallet();
-  const [activeTab, setActiveTab] = useState<'holdings' | 'history' | 'proofs'>('holdings');
+  const { holdings, history, loading, loadServerState } = useWitnessStore();
+
+  const [activeTab, setActiveTab] = useState<'holdings' | 'history'>('holdings');
   const [copiedCommitment, setCopiedCommitment] = useState(false);
 
-  // Sample private investor holdings maintained in local witness state
-  const mockHoldings = [
-    {
-      offeringId: '550e8400-e29b-41d4-a716-446655440001',
-      name: 'Celestial Apex #001',
-      collection: 'Celestial Apex',
-      imageUrl: 'https://picsum.photos/seed/celestial001/800/800',
-      sharesOwned: 1200,
-      totalShares: 10000,
-      ownershipPercentage: 12.0,
-      sharePrice: 50000,
-      currentValueDust: 60000000,
-      purchasedAt: '2026-07-20T14:32:00Z',
-    },
-    {
-      offeringId: '550e8400-e29b-41d4-a716-446655440002',
-      name: 'Shadow Realm Land Parcel #0047',
-      collection: 'Shadow Realm',
-      imageUrl: 'https://picsum.photos/seed/shadowrealm047/800/800',
-      sharesOwned: 450,
-      totalShares: 5000,
-      ownershipPercentage: 9.0,
-      sharePrice: 120000,
-      currentValueDust: 54000000,
-      purchasedAt: '2026-07-22T09:15:00Z',
-    },
-  ];
+  // Transfer modal state
+  const [transferHolding, setTransferHolding] = useState<PrivateHolding | null>(null);
+  const [transferModalOpen, setTransferModalOpen] = useState(false);
 
-  const totalPortfolioValueDust = mockHoldings.reduce((sum, h) => sum + h.currentValueDust, 0);
+  useEffect(() => {
+    if (wallet.commitment) {
+      loadServerState(wallet.commitment);
+    }
+  }, [wallet.commitment, loadServerState]);
+
+  const holdingsList = Object.values(holdings);
+
+  const totalPortfolioValueDust = holdingsList.reduce(
+    (sum, h) => sum + h.sharesOwned * h.sharePrice,
+    0
+  );
+
+  const totalSharesOwned = holdingsList.reduce((sum, h) => sum + h.sharesOwned, 0);
 
   const handleCopyCommitment = () => {
     if (wallet.commitment) {
@@ -61,6 +56,11 @@ export default function InvestorDashboardPage() {
       setCopiedCommitment(true);
       setTimeout(() => setCopiedCommitment(false), 2000);
     }
+  };
+
+  const handleOpenTransfer = (holding: PrivateHolding) => {
+    setTransferHolding(holding);
+    setTransferModalOpen(true);
   };
 
   if (wallet.status !== 'connected') {
@@ -88,7 +88,7 @@ export default function InvestorDashboardPage() {
         <div>
           <div className="flex items-center gap-2 text-xs text-brand-400 font-semibold uppercase tracking-wider">
             <Shield className="h-4 w-4" />
-            <span>Zero-Knowledge Investor Dashboard</span>
+            <span>Zero-Knowledge Investor Dashboard (Server DB Persisted)</span>
           </div>
           <h1 className="heading-xl text-white mt-1">My Confidential Holdings</h1>
         </div>
@@ -102,6 +102,7 @@ export default function InvestorDashboardPage() {
           <button
             onClick={handleCopyCommitment}
             className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 transition-colors"
+            title="Copy identity commitment"
           >
             {copiedCommitment ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
           </button>
@@ -121,85 +122,120 @@ export default function InvestorDashboardPage() {
 
         <GlassCard className="space-y-2">
           <span className="text-xs text-slate-400 font-medium">Active Fractional Holdings</span>
-          <p className="text-2xl font-bold text-brand-300">{mockHoldings.length} Assets</p>
-          <span className="text-[11px] text-slate-400">1,650 Total Shares Owned</span>
+          <p className="text-2xl font-bold text-brand-300">{holdingsList.length} Assets</p>
+          <span className="text-[11px] text-slate-400">{totalSharesOwned.toLocaleString()} Total Shares Owned</span>
         </GlassCard>
 
         <GlassCard className="space-y-2">
-          <span className="text-xs text-slate-400 font-medium">Privacy Status</span>
+          <span className="text-xs text-slate-400 font-medium">Privacy & Database Status</span>
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-base font-bold text-emerald-400">100% ZK Private</span>
+            <span className="text-base font-bold text-emerald-400">Server DB Sync Active</span>
           </div>
           <span className="text-[11px] text-slate-400">Zero Holdings On Public Ledger</span>
         </GlassCard>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-white/10 text-xs font-semibold">
+      <div className="flex border-b border-white/10 text-xs font-semibold justify-between items-center">
+        <div className="flex">
+          <button
+            onClick={() => setActiveTab('holdings')}
+            className={`px-6 py-3 border-b-2 transition-colors ${
+              activeTab === 'holdings'
+                ? 'border-brand-500 text-white'
+                : 'border-transparent text-slate-400 hover:text-white'
+            }`}
+          >
+            My Fractional Assets ({holdingsList.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`px-6 py-3 border-b-2 transition-colors ${
+              activeTab === 'history'
+                ? 'border-brand-500 text-white'
+                : 'border-transparent text-slate-400 hover:text-white'
+            }`}
+          >
+            Confidential History ({history.length})
+          </button>
+        </div>
+
         <button
-          onClick={() => setActiveTab('holdings')}
-          className={`px-6 py-3 border-b-2 transition-colors ${
-            activeTab === 'holdings'
-              ? 'border-brand-500 text-white'
-              : 'border-transparent text-slate-400 hover:text-white'
-          }`}
+          onClick={() => wallet.commitment && loadServerState(wallet.commitment)}
+          className="btn-secondary text-xs py-1.5 px-3 mb-2"
         >
-          My Fractional Assets ({mockHoldings.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('history')}
-          className={`px-6 py-3 border-b-2 transition-colors ${
-            activeTab === 'history'
-              ? 'border-brand-500 text-white'
-              : 'border-transparent text-slate-400 hover:text-white'
-          }`}
-        >
-          Confidential History
+          <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+          <span>Sync Server DB</span>
         </button>
       </div>
 
       {/* Tab Content */}
       {activeTab === 'holdings' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {mockHoldings.map((h) => (
-            <GlassCard key={h.offeringId} hoverEffect className="space-y-4">
-              <div className="flex gap-4">
-                <div className="relative h-20 w-20 rounded-xl overflow-hidden bg-midnight-900 shrink-0">
-                  <Image src={h.imageUrl} alt={h.name} fill className="object-cover" />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <span className="text-[10px] text-brand-300 uppercase font-semibold">{h.collection}</span>
-                  <h3 className="text-base font-bold text-white line-clamp-1">{h.name}</h3>
-                  <p className="text-xs text-slate-400">
-                    Owned: <strong className="text-white">{h.sharesOwned.toLocaleString()} shares</strong> ({h.ownershipPercentage}%)
-                  </p>
-                </div>
-              </div>
+        holdingsList.length === 0 ? (
+          <GlassCard className="p-12 text-center space-y-4">
+            <Shield className="h-12 w-12 text-slate-500 mx-auto" />
+            <h3 className="text-lg font-bold text-white">No Private Holdings Found</h3>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              Explore drops on the marketplace and purchase fractional shares to start building your ZK private portfolio.
+            </p>
+            <Link href="/marketplace" className="btn-primary text-xs mx-auto inline-flex">
+              Explore Drops
+            </Link>
+          </GlassCard>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {holdingsList.map((h) => {
+              const ownershipPct = ((h.sharesOwned / h.totalShares) * 100).toFixed(1);
+              const holdingValuation = h.sharesOwned * h.sharePrice;
 
-              <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/10 text-xs">
-                <div>
-                  <span className="text-slate-400 block text-[11px]">Current Value</span>
-                  <span className="font-bold text-white text-sm">{formatDust(h.currentValueDust)}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[11px]">Unit Price</span>
-                  <span className="font-bold text-slate-300 text-sm">{formatDust(h.sharePrice)}</span>
-                </div>
-              </div>
+              return (
+                <GlassCard key={h.offeringId} hoverEffect className="space-y-4">
+                  <div className="flex gap-4">
+                    <div className="relative h-20 w-20 rounded-xl overflow-hidden bg-midnight-900 shrink-0">
+                      <Image src={h.imageUrl} alt={h.name} fill className="object-cover" />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <span className="text-[10px] text-brand-300 uppercase font-semibold">{h.collection}</span>
+                      <h3 className="text-base font-bold text-white line-clamp-1">{h.name}</h3>
+                      <p className="text-xs text-slate-400">
+                        Owned: <strong className="text-white">{h.sharesOwned.toLocaleString()} shares</strong> ({ownershipPct}%)
+                      </p>
+                    </div>
+                  </div>
 
-              <div className="flex gap-2">
-                <Link
-                  href={`/marketplace/${h.offeringId}`}
-                  className="w-full btn-secondary text-xs justify-center py-2"
-                >
-                  <Eye className="h-3.5 w-3.5" />
-                  <span>View Drop Details</span>
-                </Link>
-              </div>
-            </GlassCard>
-          ))}
-        </div>
+                  <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/10 text-xs">
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">Current Value</span>
+                      <span className="font-bold text-white text-sm">{formatDust(holdingValuation)}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">Unit Price</span>
+                      <span className="font-bold text-slate-300 text-sm">{formatDust(h.sharePrice)}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleOpenTransfer(h)}
+                      className="btn-secondary text-xs flex-1 justify-center py-2"
+                    >
+                      <Send className="h-3.5 w-3.5" />
+                      <span>Transfer Privately</span>
+                    </button>
+                    <Link
+                      href={`/marketplace/${h.offeringId}`}
+                      className="btn-primary text-xs flex-1 justify-center py-2"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                      <span>View Drop Details</span>
+                    </Link>
+                  </div>
+                </GlassCard>
+              );
+            })}
+          </div>
+        )
       )}
 
       {activeTab === 'history' && (
@@ -212,23 +248,29 @@ export default function InvestorDashboardPage() {
               <span>Amount (DUST)</span>
               <span>Privacy Shield</span>
             </div>
-            <div className="flex items-center justify-between text-xs text-slate-200 py-2">
-              <span className="badge-active">BUY_SHARES</span>
-              <span>Celestial Apex #001</span>
-              <span>1,200</span>
-              <span>60,000,000 tDUST</span>
-              <span className="text-emerald-400 font-mono">ZK Verified</span>
-            </div>
-            <div className="flex items-center justify-between text-xs text-slate-200 py-2">
-              <span className="badge-active">BUY_SHARES</span>
-              <span>Shadow Realm Land #0047</span>
-              <span>450</span>
-              <span>54,000,000 tDUST</span>
-              <span className="text-emerald-400 font-mono">ZK Verified</span>
-            </div>
+            {history.map((tx) => (
+              <div key={tx.id} className="flex items-center justify-between text-xs text-slate-200 py-2 border-b border-white/5 last:border-0">
+                <span className={`badge-active py-0.5 px-2 text-[10px] ${
+                  tx.type === 'TRANSFER_SHARES' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : ''
+                }`}>
+                  {tx.type}
+                </span>
+                <span className="font-semibold">{tx.offeringName}</span>
+                <span>{tx.shares.toLocaleString()}</span>
+                <span>{formatDust(tx.amountDust)}</span>
+                <span className="text-emerald-400 font-mono text-[11px]">Server DB & ZK Verified</span>
+              </div>
+            ))}
           </div>
         </GlassCard>
       )}
+
+      {/* Transfer Shares Modal */}
+      <TransferModal
+        holding={transferHolding}
+        isOpen={transferModalOpen}
+        onClose={() => setTransferModalOpen(false)}
+      />
     </div>
   );
 }

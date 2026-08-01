@@ -7,7 +7,8 @@
  * - Request logging (Morgan)
  * - Rate limiting per IP
  * - JSON body parsing
- * - All route modules
+ * - Server database persistence
+ * - PostHog & AI Telemetry analytics routes
  * - Centralized error handling
  */
 
@@ -21,6 +22,8 @@ import rateLimit from 'express-rate-limit';
 import offeringsRouter from './routes/offerings.js';
 import proofsRouter from './routes/proofs.js';
 import feedbackRouter from './routes/feedback.js';
+import investorRouter from './routes/investor.js';
+import analyticsRouter from './routes/analytics.js';
 import { errorHandler, notFoundHandler, sendSuccess } from './middleware/index.js';
 
 const app = express();
@@ -40,7 +43,7 @@ const NODE_ENV = process.env['NODE_ENV'] ?? 'development';
 // Security headers
 app.use(helmet());
 
-// CORS — allow only the PrivyMint frontend
+// CORS — allow frontend requests
 app.use(cors({
   origin: NODE_ENV === 'production' ? FRONTEND_URL : '*',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -81,6 +84,10 @@ app.get('/health', (_req, res) => {
 app.use('/api/offerings', offeringsRouter);
 app.use('/api/proofs', proofsRouter);
 app.use('/api/feedback', feedbackRouter);
+app.use('/api/investor', investorRouter);
+app.use('/api/analytics', analyticsRouter);
+app.use('/api/ai', analyticsRouter);
+app.use('/api/telemetry', analyticsRouter);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ERROR HANDLING (must be last)
@@ -93,14 +100,17 @@ app.use(errorHandler);
 // START SERVER
 // ─────────────────────────────────────────────────────────────────────────────
 
-app.listen(PORT, () => {
-  console.log(`\n🌙 PrivyMint API Server`);
-  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-  console.log(`  Environment:  ${NODE_ENV}`);
-  console.log(`  Port:         ${PORT}`);
-  console.log(`  Network:      ${process.env['MIDNIGHT_NETWORK'] ?? 'preprod'}`);
-  console.log(`  Contract:     ${process.env['CONTRACT_ADDRESS'] ?? '<not set>'}`);
-  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`\n🌙 PrivyMint API Server & AI Telemetry Engine`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`  Environment:  ${NODE_ENV}`);
+    console.log(`  Port:         ${PORT}`);
+    console.log(`  Network:      ${process.env['MIDNIGHT_NETWORK'] ?? 'preprod'}`);
+    console.log(`  Database:     Server Persistent DB`);
+    console.log(`  PostHog:      Active`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+  });
+}
 
 export default app;

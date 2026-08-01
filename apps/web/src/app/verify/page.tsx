@@ -1,17 +1,42 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Shield, CheckCircle2, XCircle, Search, Sparkles, Copy, Check, FileCode2 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { verifyOwnershipProof } from '@/lib/api-client';
 
-export default function ZkVerifierPage() {
+function ZkVerifierForm() {
+  const searchParams = useSearchParams();
+
   const [proofData, setProofData] = useState('');
   const [offeringId, setOfferingId] = useState('550e8400-e29b-41d4-a716-446655440001');
   const [minShares, setMinShares] = useState(1);
   const [verifying, setVerifying] = useState(false);
   const [result, setResult] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const urlProof = searchParams.get('proof');
+    const urlOfferingId = searchParams.get('offeringId');
+    const urlMinShares = searchParams.get('minShares');
+
+    if (urlProof) setProofData(urlProof);
+    if (urlOfferingId) setOfferingId(urlOfferingId);
+    if (urlMinShares) setMinShares(parseInt(urlMinShares) || 1);
+
+    if (urlProof && urlOfferingId) {
+      // Auto-trigger verification when parameters passed from ZK Proof modal
+      verifyOwnershipProof({
+        offeringId: urlOfferingId,
+        minimumShares: parseInt(urlMinShares ?? '1') || 1,
+        proofData: urlProof,
+        publicInputs: [urlOfferingId, urlMinShares ?? '1'],
+      })
+        .then((res) => setResult(res))
+        .catch((err) => setError(err instanceof Error ? err.message : 'Verification failed'));
+    }
+  }, [searchParams]);
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,19 +65,7 @@ export default function ZkVerifierPage() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      {/* Header */}
-      <div className="space-y-2 border-b border-white/10 pb-6 text-center">
-        <div className="inline-flex items-center gap-2 text-xs text-brand-400 font-semibold uppercase tracking-wider">
-          <Shield className="h-4 w-4" />
-          <span>Midnight Zero-Knowledge Verifier</span>
-        </div>
-        <h1 className="heading-xl text-white">Standalone ZK Proof Verifier</h1>
-        <p className="text-sm text-slate-400 max-w-xl mx-auto">
-          Validate selective ownership proofs generated via Midnight `disclose()` without revealing the investor&apos;s wallet address or total portfolio holdings.
-        </p>
-      </div>
-
+    <div className="space-y-8">
       <form onSubmit={handleVerify} className="space-y-6">
         <GlassCard className="p-8 space-y-6 border-brand-500/30">
           <div className="space-y-4 text-xs">
@@ -151,6 +164,28 @@ export default function ZkVerifierPage() {
           </div>
         </GlassCard>
       )}
+    </div>
+  );
+}
+
+export default function ZkVerifierPage() {
+  return (
+    <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      {/* Header */}
+      <div className="space-y-2 border-b border-white/10 pb-6 text-center">
+        <div className="inline-flex items-center gap-2 text-xs text-brand-400 font-semibold uppercase tracking-wider">
+          <Shield className="h-4 w-4" />
+          <span>Midnight Zero-Knowledge Verifier</span>
+        </div>
+        <h1 className="heading-xl text-white">Standalone ZK Proof Verifier</h1>
+        <p className="text-sm text-slate-400 max-w-xl mx-auto">
+          Validate selective ownership proofs generated via Midnight `disclose()` without revealing the investor&apos;s wallet address or total portfolio holdings.
+        </p>
+      </div>
+
+      <Suspense fallback={<div className="h-48 skeleton rounded-2xl w-full" />}>
+        <ZkVerifierForm />
+      </Suspense>
     </div>
   );
 }
