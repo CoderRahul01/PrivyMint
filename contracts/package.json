@@ -6,14 +6,16 @@
   "scripts": {
     "build": "compact compile privymint.compact build/ && compact compile privymint.compact managed/",
     "compile": "compact compile privymint.compact build/",
-    "deploy:preprod": "npx -y tsx scripts/deploy-preprod.ts"
+    "deploy:preview": "npx -y tsx scripts/deploy-preview.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@midnight-ntwrk/midnight-js-protocol": "^0.14.0"
   },
   "devDependencies": {
     "tsx": "^4.15.6",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
   }
 }
 

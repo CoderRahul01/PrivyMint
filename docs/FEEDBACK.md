@@ -1,7 +1,7 @@
 # User Feedback & Iteration Log — Level 5 & 6
 
 ## Feedback Collection Method
-Feedback collected via built-in PrivyMint Beta Feedback Modal (`/onboarding`), Telegram developer groups, and direct tester interviews on Midnight Preprod.
+Feedback collected via built-in PrivyMint Beta Feedback Modal (`/onboarding`), Telegram developer groups, and direct tester interviews on Midnight Preview.
 
 ## Raw Feedback Log
 | # | User Category | Feedback Summary | Date | Rating |

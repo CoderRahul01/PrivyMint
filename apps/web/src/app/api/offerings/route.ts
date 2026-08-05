@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { listOfferingsServerless, createOfferingServerless } from '@/lib/store';
+import { db } from '@/lib/db';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const limit = searchParams.get('limit') ? Number(searchParams.get('limit')) : undefined;
   const sortBy = searchParams.get('sortBy') || undefined;
 
-  const data = listOfferingsServerless({
+  const data = await db.listOfferings({
     category: category as any,
     status: status as any,
     search,
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const offering = createOfferingServerless(body);
+    const offering = await db.createOffering(body);
     return NextResponse.json(
       {
         success: true,

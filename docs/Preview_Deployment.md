@@ -1,19 +1,23 @@
-# PrivyMint — Midnight Preprod Devnet Deployment & Setup Guide
+# PrivyMint — Midnight Preview Network Deployment & Setup Guide
 
-This guide documents the complete end-to-end setup and deployment of **PrivyMint** on the **Midnight Network Preprod Devnet**.
+This guide documents the complete end-to-end setup and deployment of **PrivyMint** on the **Midnight Network Preview**.
+
+> Migrated from Preprod: the Preprod devnet and its faucet were down, so PrivyMint moved to
+> Preview, the currently stable Midnight test network. The historical Preprod deployment address
+> is kept in [README.md](../README.md) for reference but is no longer the active target.
 
 ---
 
-## 🌙 Preprod Deployment Summary
+## 🌙 Preview Deployment Summary
 
-- **Target Network**: Midnight Preprod Devnet (`chain-id: 0x2`)
+- **Target Network**: Midnight Preview
 - **Contract Name**: `PrivyMintNFTFractionalizer`
-- **Contract Source**: [`contracts/privymint.compact`](file:///Volumes/Powerhouse/Hackathon/2026/midnight/PrivyMint/contracts/privymint.compact)
+- **Contract Source**: [`contracts/privymint.compact`](../contracts/privymint.compact)
 - **Compiler Version**: Compact `0.14.0`
-- **Verified Contract Address**: `0x07f18b6e82c4819d45a90e44bf3e4b162547d2cf931b671a5e91e58e39ad91f2`
-- **Deployment Transaction Hash**: `0x8f3c71a9b42e10d9e83f5c71b02a4869c3d1f5e27a91b40284712e5934a01c89`
-- **Preprod RPC Node**: `https://rpc.preprod.midnight.network`
-- **Preprod Indexer**: `https://indexer.preprod.midnight.network`
+- **Contract Address**: set once `deploy-preview.ts` has been run against a funded Preview wallet (see below)
+- **Preview RPC Node**: `https://rpc.preview.midnight.network`
+- **Preview Indexer**: `https://indexer.preview.midnight.network`
+- **Preview Faucet**: `https://faucet.preview.midnight.network/`
 
 ---
 
@@ -44,18 +48,27 @@ npm run contract:compile
 
 This compiles `contracts/privymint.compact` into TypeScript bindings and zero-knowledge circuit artifacts in `contracts/build/`.
 
-### 3. Deploy Contract to Midnight Preprod
+### 3. Fund a Preview Wallet
 
-Run the automated Preprod deployment script:
+1. Install the Midnight **Lace** wallet extension and switch it to the **Preview** network.
+2. Copy your Preview-network wallet address from Lace.
+3. Paste it into the faucet at `https://faucet.preview.midnight.network/` and request tokens.
+
+### 4. Deploy Contract to Midnight Preview
+
+Run the deployment script, passing your funded Preview address as `CONTRACT_ADDRESS`:
 
 ```bash
-npx tsx contracts/scripts/deploy-preprod.ts
+CONTRACT_ADDRESS=<your-preview-wallet-address> npx tsx contracts/scripts/deploy-preview.ts
 ```
 
 This script will:
-1. Validate `privymint.compact` circuit signatures.
-2. Submit the deployment transaction to the Midnight Preprod RPC.
-3. Save deployment verification metadata to `contracts/build/deployment-preprod.json`.
+1. Compile `privymint.compact`.
+2. Write deployment verification metadata to `contracts/build/deployment-preview.json`.
+
+> **Known gap**: this script does not submit a real on-chain transaction (the Preprod version had
+> the same limitation) — it records deterministic metadata locally. Real submission would require
+> wallet-signed transactions via `@midnight-ntwrk/midnight-js-protocol`, which isn't wired up yet.
 
 ---
 
@@ -63,15 +76,15 @@ This script will:
 
 PrivyMint seamlessly integrates with the **Midnight Lace Extension** on Chrome / Brave:
 
-1. **Install Lace Extension**: Install the Midnight Lace Wallet extension supporting Preprod devnet.
-2. **Switch Network**: Ensure the wallet is toggled to `Preprod Devnet`.
+1. **Install Lace Extension**: Install the Midnight Lace Wallet extension supporting the Preview network.
+2. **Switch Network**: Ensure the wallet is toggled to `Preview`.
 3. **Connect DApp**:
    - Open PrivyMint web app (`http://localhost:3000`).
    - Click **Connect Wallet** in the top navigation bar.
    - The app invokes `window.midnight.enable()` (or `window.cardano.midnight.enable()`).
    - Upon user approval, the DApp receives your public address witness and identity commitment hash.
 
-> **Local Development Fallback**: If no Lace extension is detected in the browser, PrivyMint automatically switches to interactive devnet simulation mode, generating deterministic commitment hashes for local testing.
+> **Local Development Fallback**: If no Lace extension is detected in the browser, PrivyMint automatically switches to interactive ZK sandbox simulation mode, generating deterministic commitment hashes for local testing.
 
 ---
 

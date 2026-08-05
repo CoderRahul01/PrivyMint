@@ -105,7 +105,7 @@ export default function HomePage() {
     { level: '🌑 Level 1', title: 'Compact & Compiler Setup', status: 'Completed' },
     { level: '🌒 Level 2', title: 'Midnight Wallet Integration', status: 'Completed' },
     { level: '🌓 Level 3', title: 'Production App & CI/CD Pipeline', status: 'Completed' },
-    { level: '🌔 Level 4', title: 'Preprod MVP & Documentation', status: 'Completed' },
+    { level: '🌔 Level 4', title: 'Preview MVP & Documentation', status: 'Completed' },
     { level: '🌕 Level 5', title: 'User Onboarding & Feedback Hooks', status: 'Active Beta' },
     { level: '🌝 Level 6', title: 'Mainnet Ready & Scale Architecture', status: 'Ready' },
   ];
@@ -125,7 +125,7 @@ export default function HomePage() {
     },
     {
       q: 'Is PrivyMint deployed on Mainnet yet?',
-      a: 'PrivyMint is compiled for the Midnight Preprod Network with manual deployment ready (`<YOUR_DEPLOYED_CONTRACT_ADDRESS>`). It is currently participating in the Midnight Monthly Moonshots Program.',
+      a: 'PrivyMint is compiled for the Midnight Preview Network with manual deployment ready (`<YOUR_DEPLOYED_CONTRACT_ADDRESS>`). It is currently participating in the Midnight Monthly Moonshots Program.',
     },
   ];
 
@@ -179,7 +179,7 @@ export default function HomePage() {
             <span className="block text-xs text-slate-400 mt-1">Compact Compiler Verified</span>
           </GlassCard>
           <GlassCard className="p-4 text-center">
-            <span className="text-2xl font-bold text-emerald-400">Preprod</span>
+            <span className="text-2xl font-bold text-emerald-400">Preview</span>
             <span className="block text-xs text-slate-400 mt-1">Midnight Testnet Ready</span>
           </GlassCard>
           <GlassCard className="p-4 text-center">

@@ -61,7 +61,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               <MessageSquare className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Preprod User Feedback</h3>
+              <h3 className="text-lg font-bold text-white">Preview User Feedback</h3>
               <p className="text-xs text-slate-400">Moonshots Level 5 User Evaluation</p>
             </div>
           </div>

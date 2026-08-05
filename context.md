@@ -25,6 +25,6 @@ PrivyMint is engineered from day one to progress through all 6 levels of the Mid
 - **Level 1**: Compact toolchain setup, production smart contract (`privymint.compact`), compiler verification, local test setup.
 - **Level 2**: Integrated web app, Midnight wallet connection provider, contract interaction hooks, state transition verification.
 - **Level 3**: Production-grade full-stack application (Next.js, Express API, Zustand, React Query, TailwindCSS/shadcn), CI/CD pipeline, automated test suite, extensive documentation.
-- **Level 4**: MVP deployed on Preprod configuration with complete setup guides, public repository structure, launch-ready branding assets.
-- **Level 5**: Built-in feedback collection system, user onboarding flow, usage analytics hooks for 50+ Preprod beta users.
+- **Level 4**: MVP deployed on Preview configuration with complete setup guides, public repository structure, launch-ready branding assets.
+- **Level 5**: Built-in feedback collection system, user onboarding flow, usage analytics hooks for 50+ Preview beta users.
 - **Level 6**: Mainnet deployment architecture, scale-ready APIs, secondary market hooks, DAO governance hooks, and institutional privacy features.

@@ -54,9 +54,9 @@ compact build contracts/privymint.compact
 
 > **⚠️ Manual deployment only.** The contract is NOT automatically deployed.
 >
-> When ready for Preprod or Mainnet deployment, run:
+> When ready for Preview or Mainnet deployment, run:
 > ```bash
-> compact deploy contracts/privymint.compact --network preprod
+> compact deploy contracts/privymint.compact --network preview
 > ```
 > Then update `CONTRACT_ADDRESS=<YOUR_DEPLOYED_CONTRACT_ADDRESS>` in `.env`.
 

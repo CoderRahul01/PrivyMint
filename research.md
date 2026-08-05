@@ -14,7 +14,7 @@ Key Compact Concepts implemented in PrivyMint:
 
 ### Midnight Wallet & Client Integration
 - **Midnight Wallet API**: Exposes injected provider (`window.midnight`) for account connection, signing ZK proofs, and transaction submission.
-- **Midnight SDK (`@midnight-ntwrk/midnight-js-*`)**: Client library interfacing between the web app, local ZK proof generation, and the Midnight RPC node (Devnet/Preprod).
+- **Midnight SDK (`@midnight-ntwrk/midnight-js-*`)**: Client library interfacing between the web app, local ZK proof generation, and the Midnight RPC node (Devnet/Preview).
 - **Proof Generation**: ZK proofs are compiled locally on the client browser before submitting transaction payloads to the RPC node, ensuring zero sensitive data ever touches the network unencrypted.
 
 ### Security & Privacy Threat Model

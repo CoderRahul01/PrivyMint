@@ -75,7 +75,7 @@ app.get('/health', (_req, res) => {
   sendSuccess(res, {
     status: 'healthy',
     version: '0.1.0',
-    network: process.env['MIDNIGHT_NETWORK'] ?? 'preprod',
+    network: process.env['MIDNIGHT_NETWORK'] ?? 'preview',
     contractAddress: process.env['CONTRACT_ADDRESS'] ?? '<YOUR_DEPLOYED_CONTRACT_ADDRESS>',
   });
 });
@@ -106,7 +106,7 @@ if (process.env.NODE_ENV !== 'test') {
     console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
     console.log(`  Environment:  ${NODE_ENV}`);
     console.log(`  Port:         ${PORT}`);
-    console.log(`  Network:      ${process.env['MIDNIGHT_NETWORK'] ?? 'preprod'}`);
+    console.log(`  Network:      ${process.env['MIDNIGHT_NETWORK'] ?? 'preview'}`);
     console.log(`  Database:     Server Persistent DB`);
     console.log(`  PostHog:      Active`);
     console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);

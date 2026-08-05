@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Moon, ShieldCheck, Zap, X, Info, CheckCircle2 } from 'lucide-react';
 import { useWitnessStore } from '@/context/WitnessStore';
 
-export function PreprodBanner() {
+export function PreviewBanner() {
   const [dismissed, setDismissed] = useState(false);
   const { executionMode, setExecutionMode } = useWitnessStore();
 
@@ -20,7 +20,7 @@ export function PreprodBanner() {
             <span>August Kickoff</span>
           </span>
           <p className="text-[11px] sm:text-xs text-slate-300">
-            <strong className="text-white font-semibold">Midnight Update Notice:</strong> Preprod infrastructure upgrades active.{' '}
+            <strong className="text-white font-semibold">Midnight Update Notice:</strong> Now running on Preview network.{' '}
             <span className="hidden md:inline text-slate-400">
               PrivyMint includes an auto-fallback ZK sandbox to guarantee uninterrupted testing.
             </span>
@@ -38,22 +38,22 @@ export function PreprodBanner() {
                   ? 'bg-brand-500 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
-              title="Local ZK Sandbox mode guarantees zero transaction failures during Preprod testnet downtime"
+              title="Local ZK Sandbox mode guarantees zero transaction failures during Preview network downtime"
             >
               <Zap className="h-3 w-3" />
               <span>ZK Sandbox</span>
             </button>
             <button
-              onClick={() => setExecutionMode('preprod')}
+              onClick={() => setExecutionMode('preview')}
               className={`px-2.5 py-1 rounded font-semibold transition-all flex items-center gap-1 ${
-                executionMode === 'preprod'
+                executionMode === 'preview'
                   ? 'bg-emerald-500 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
-              title="Midnight Preprod Devnet network integration"
+              title="Midnight Preview network integration"
             >
               <ShieldCheck className="h-3 w-3" />
-              <span>Preprod RPC</span>
+              <span>Preview RPC</span>
             </button>
           </div>
 

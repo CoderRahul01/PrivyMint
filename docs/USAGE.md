@@ -3,8 +3,8 @@
 Welcome to **PrivyMint**, the privacy-first NFT fractionalization platform on Midnight Network!
 
 ## What You Need
-1. **Midnight Lace Wallet** or Preprod Browser Extension.
-2. **Preprod tADA / tDUST tokens** (available via Midnight Testnet Faucet).
+1. **Midnight Lace Wallet** or Preview Browser Extension.
+2. **Preview tADA / tDUST tokens** (available via Midnight Testnet Faucet).
 
 ---
 

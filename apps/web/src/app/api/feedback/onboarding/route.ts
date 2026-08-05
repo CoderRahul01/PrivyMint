@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { saveOnboardingEventServerless } from '@/lib/store';
+import { db } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    saveOnboardingEventServerless(body);
+    await db.saveOnboardingEvent(body);
     return NextResponse.json(
       {
         success: true,

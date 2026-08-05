@@ -120,7 +120,7 @@ export function Footer() {
             <span className="hover:text-slate-400 transition-colors cursor-pointer">Terms of Service</span>
             <span className="text-emerald-400 flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Midnight Preprod Ready
+              Midnight Preview Ready
             </span>
           </div>
         </div>

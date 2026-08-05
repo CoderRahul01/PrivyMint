@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Shield, Wallet, ChevronDown, Award, Menu, X, Zap, ShieldCheck } from 'lucide-react';
 import { useWallet } from '@/context/WalletContext';
 import { useWitnessStore } from '@/context/WitnessStore';
-import { PreprodBanner } from '@/components/ui/PreprodBanner';
+import { PreviewBanner } from '@/components/ui/PreviewBanner';
 import { truncateHex } from '@/lib/utils';
 
 export function Navbar() {
@@ -34,7 +34,7 @@ export function Navbar() {
 
   return (
     <>
-      <PreprodBanner />
+      <PreviewBanner />
       <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-midnight-950/85 backdrop-blur-xl transition-all">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 h-16 sm:h-20">
           
@@ -81,7 +81,7 @@ export function Navbar() {
             ) : (
               <div className="hidden md:flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 text-[11px] font-semibold text-emerald-400">
                 <ShieldCheck className="h-3 w-3 text-emerald-400" />
-                <span>Preprod Network</span>
+                <span>Preview Network</span>
               </div>
             )}
 
@@ -166,7 +166,7 @@ export function Navbar() {
             <div className="pt-3 border-t border-white/10 flex flex-col gap-3">
               <div className="flex items-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 text-xs text-emerald-400 justify-center">
                 <Award className="h-3.5 w-3.5" />
-                <span>Preprod Devnet</span>
+                <span>Preview Network</span>
               </div>
 
               {wallet.status === 'connected' ? (

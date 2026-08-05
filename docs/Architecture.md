@@ -62,7 +62,7 @@ graph TD
     User[Investor / Creator] -->|Connect Wallet| WalletCtx[Midnight Wallet Provider]
     User -->|Browse / Buy / Launch| NextApp[Apps/Web Next.js Frontend]
     NextApp -->|ZK Proof Local Execution| CompactEngine[Compact ZK Prover Client]
-    CompactEngine -->|Submit Proofs| MidnightChain[Midnight Preprod Ledger State]
+    CompactEngine -->|Submit Proofs| MidnightChain[Midnight Preview Ledger State]
     NextApp -->|Index & Fetch Metadata| ExpressAPI[Apps/API Express Server]
     ExpressAPI -->|Zod Validation & Storage| InMemStore[Off-Chain Metadata Indexer]
 ```

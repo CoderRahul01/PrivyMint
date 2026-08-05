@@ -37,11 +37,14 @@ jobs:
         run: npm run build --workspace=apps/web
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001
-          NEXT_PUBLIC_NETWORK: preprod
+          NEXT_PUBLIC_NETWORK: preview
           NEXT_PUBLIC_CONTRACT_ADDRESS: '<YOUR_DEPLOYED_CONTRACT_ADDRESS>'
 
-      - name: Verify Compact Smart Contract Syntax
+      - name: Verify Compact Smart Contract Files & Syntax
         run: |
-          echo "Verifying Compact contract file exists..."
+          echo "Verifying Compact contract files exist in root and contracts/ directories..."
           test -f contracts/privymint.compact
-          echo "Compact smart contract structure validated."
+          test -f contracts/contract.compact
+          test -f privymint.compact
+          test -f contract.compact
+          echo "All Compact smart contract files successfully verified."

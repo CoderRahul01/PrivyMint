@@ -26,12 +26,12 @@ export interface PrivateTransaction {
 }
 
 interface WitnessStoreState {
-  executionMode: 'sandbox' | 'preprod';
+  executionMode: 'sandbox' | 'preview';
   holdings: Record<string, PrivateHolding>;
   history: PrivateTransaction[];
   loading: boolean;
   error: string | null;
-  setExecutionMode: (mode: 'sandbox' | 'preprod') => void;
+  setExecutionMode: (mode: 'sandbox' | 'preview') => void;
   loadServerState: (commitment: string) => Promise<void>;
   addShares: (commitment: string, offeringId: string, sharesToBuy: number) => Promise<boolean>;
   transferShares: (senderCommitment: string, recipientCommitment: string, offeringId: string, shares: number) => Promise<boolean>;

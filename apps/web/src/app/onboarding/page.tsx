@@ -46,7 +46,7 @@ export default function OnboardingPage() {
           <Moon className="h-3.5 w-3.5" />
           <span>Midnight Moonshots Level 5 Onboarding</span>
         </div>
-        <h1 className="heading-xl text-white">Preprod Beta Tester Program</h1>
+        <h1 className="heading-xl text-white">Preview Beta Tester Program</h1>
         <p className="text-sm text-slate-400 max-w-xl mx-auto">
           Help us refine PrivyMint for the Midnight ecosystem. Test fractional drops, generate ZK proofs, and submit feedback to help us reach Supermoon Level 6.
         </p>

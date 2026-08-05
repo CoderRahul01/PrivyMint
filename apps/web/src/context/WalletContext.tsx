@@ -9,7 +9,7 @@
  *
  * In a full Midnight integration, the `connectWallet()` function would call:
  *   window.midnight.enable() — injected by the Midnight browser extension wallet
- * For Preprod v0.1, we simulate the wallet state with a realistic flow.
+ * For Preview v0.1, we simulate the wallet state with a realistic flow.
  */
 
 import React, { createContext, useContext, useCallback } from 'react';
@@ -85,7 +85,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
    * Connect to the Midnight Wallet.
    *
    * Production: Calls window.midnight.enable() from the Midnight browser extension.
-   * Preprod v0.1: Simulates the connection flow with a realistic async delay.
+   * Preview v0.1: Simulates the connection flow with a realistic async delay.
    */
   const connectWallet = useCallback(async () => {
     wallet.setStatus('connecting');
@@ -113,7 +113,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
                   .map((b) => b.toString(16).padStart(2, '0'))
                   .join('');
 
-          const network = provider?.network ?? process.env.NEXT_PUBLIC_NETWORK ?? 'preprod';
+          const network = provider?.network ?? process.env.NEXT_PUBLIC_NETWORK ?? 'preview';
 
           wallet.setConnected(address, commitment, network);
 
@@ -129,14 +129,14 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // Preprod simulation handshake (fallback when Lace extension is not installed or enabled)
+      // Preview simulation handshake (fallback when Lace extension is not installed or enabled)
       await sleep(1000);
 
       const simulatedAddress = `mn1prvy${Math.random().toString(36).slice(2, 10)}`;
       const simulatedCommitment = Array.from(crypto.getRandomValues(new Uint8Array(32)))
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('');
-      const network = process.env.NEXT_PUBLIC_NETWORK ?? 'preprod';
+      const network = process.env.NEXT_PUBLIC_NETWORK ?? 'preview';
 
       wallet.setConnected(simulatedAddress, simulatedCommitment, network);
 
@@ -162,7 +162,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
    * Production: Calls Midnight SDK to generate a ZK proof locally (client-side)
    * using the wallet's private witness and the contract's verifyOwnership circuit.
    *
-   * Preprod v0.1: Simulates proof generation with a realistic processing delay.
+   * Preview v0.1: Simulates proof generation with a realistic processing delay.
    */
   const generateOwnershipProof = useCallback(
     async (offeringId: string, minimumShares: number): Promise<string> => {
@@ -177,7 +177,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       // const proof = await midnight.circuit.verifyOwnership(offeringId, minimumShares);
       // return proof.toBase64();
 
-      // Preprod simulation — return a dummy proof bytes string
+      // Preview simulation — return a dummy proof bytes string
       const mockProof = Array.from(crypto.getRandomValues(new Uint8Array(64)))
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('');

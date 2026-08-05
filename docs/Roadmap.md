@@ -23,13 +23,13 @@ PrivyMint is designed to evolve continuously across the **New Moon to Full: Mont
 - [x] Configure monorepo TypeScript base config.
 - [x] Implement Vitest API integration test suite.
 
-### 🌔 Level 4 — Preprod MVP & Complete Documentation
+### 🌔 Level 4 — Preview MVP & Complete Documentation
 - [x] Complete `Architecture.md`, `PrivacyModel.md`, `API.md`, and `Roadmap.md`.
 - [x] Standalone ZK Verifier tool (`/verify`).
 - [x] Public GitHub structure with MIT License and conventional commits.
 
 ### 🌕 Level 5 — User Onboarding & Feedback Hooks
-- [x] Built-in Preprod beta feedback collection system (`/onboarding`).
+- [x] Built-in Preview beta feedback collection system (`/onboarding`).
 - [x] Anonymous feedback API endpoint (`POST /api/feedback`).
 - [x] Telemetry analytics snapshot (`GET /api/feedback/analytics`).
 

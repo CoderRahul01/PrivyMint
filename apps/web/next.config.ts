@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
   // Environment variables exposed to the browser
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001',
-    NEXT_PUBLIC_NETWORK: process.env.NEXT_PUBLIC_NETWORK ?? 'preprod',
+    NEXT_PUBLIC_NETWORK: process.env.NEXT_PUBLIC_NETWORK ?? 'preview',
     NEXT_PUBLIC_CONTRACT_ADDRESS:
       process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? '<YOUR_DEPLOYED_CONTRACT_ADDRESS>',
     NEXT_PUBLIC_APP_VERSION: '0.1.0',

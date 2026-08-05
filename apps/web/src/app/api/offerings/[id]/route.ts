@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getOfferingByIdServerless } from '@/lib/store';
+import { db } from '@/lib/db';
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
-  const offering = getOfferingByIdServerless(id);
+  const offering = await db.getOfferingById(id);
 
   if (!offering) {
     return NextResponse.json(

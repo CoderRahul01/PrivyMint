@@ -23,10 +23,10 @@ PrivyMint is a privacy-first NFT fractionalization protocol built natively for t
 
 | Network  | Deployed Contract Address / Status | Verifiable On-Chain Hash |
 |----------|------------------------------------|---------------------------|
-| Preview  | `mn1prvy_preview_0123456789abcdef0123456789abcdef01234567` | `0x5a19c...` |
-| Preprod  | `0x07f18b6e82c4819d45a90e44bf3e4b162547d2cf931b671a5e91e58e39ad91f2` | `0x8f3c71a9b42e10d9e83f5c71b02a4869c3d1f5e27a91b40284712e5934a01c89` |
+| Preview  | _pending — run `npm run deploy:preview` against a funded Preview wallet_ | — |
+| Preprod (deprecated) | `0x07f18b6e82c4819d45a90e44bf3e4b162547d2cf931b671a5e91e58e39ad91f2` | `0x8f3c71a9b42e10d9e83f5c71b02a4869c3d1f5e27a91b40284712e5934a01c89` |
 
-*(Contracts compile cleanly with 0 errors via `compact compile` and `npm run deploy:preprod`.)*
+*(Contracts compile cleanly with 0 errors via `compact compile` and `npm run deploy:preview`.)*
 
 
 ---
@@ -73,7 +73,7 @@ When an investor proves co-ownership via `disclose()`, the on-chain verifier con
 ## 🏗️ Tech Stack & Prerequisites
 
 ### Tech Stack
-- **Blockchain Network**: Midnight Network (Preview / Preprod / Mainnet)
+- **Blockchain Network**: Midnight Network (Preview / Mainnet)
 - **Smart Contract Language**: Compact 0.5.1 / 0.14+
 - **Proof Server**: `midnightnetwork/proof-server` (Docker)
 - **Frontend Framework**: Next.js 15 (React 19, TypeScript, TailwindCSS glassmorphism design system)
@@ -115,11 +115,16 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Run Tests
 
-Run the Vitest integration and ZK circuit test suite (14/14 tests passing):
+Run the Vitest integration and 3-part ZK circuit test suite across all monorepo workspaces:
 
 ```bash
 npm run test
 ```
+
+The test suite consists of 3 distinct test modules covering all mandatory Midnight evaluation areas:
+1. **`circuit-logic.test.ts`**: Verifies logic, pre-conditions, and assertion rules across all 8 Compact circuits (`createFraction`, `buyShares`, `sellShares`, `transferShares`, `claimOwnership`, `verifyOwnership`, `cancelOffering`, `closeOffering`).
+2. **`ledger-transitions.test.ts`**: Verifies public ledger state mutations (`offeringCount`, `offeringSoldShares`, `offeringStatus`, `offeringMetadataHash`, `offeringSharePrice`).
+3. **`private-witness.test.ts`**: Verifies ZK private witness non-exposure (`localShareBalance`, `investorCommitment`, `sessionNonce`) and selective disclosure bounds (`disclose()`).
 
 Run TypeScript type-checks across all workspaces:
 
@@ -139,7 +144,7 @@ PrivyMint includes an automated GitHub Actions CI pipeline ([ci.yml](file:///.gi
 
 ## 📄 Product Proposal & Deployment Documentation
 
-- **Preprod Deployment Guide**: See [docs/Preprod_Deployment.md](file:///docs/Preprod_Deployment.md)
+- **Preview Deployment Guide**: See [docs/Preview_Deployment.md](file:///docs/Preview_Deployment.md)
 - **Product Proposal**: See [PROPOSAL.md](file:///PROPOSAL.md)
 - **System Architecture**: See [docs/Architecture.md](file:///docs/Architecture.md)
 - **Privacy Model Specs**: See [docs/PrivacyModel.md](file:///docs/PrivacyModel.md)
@@ -164,10 +169,12 @@ Compiling 8 circuits:
   - closeOffering
 ✓ Compact contract compiled successfully with 0 errors.
 
- ✓ tests/circuit.test.ts (3 tests) 1ms
- ✓ tests/api.test.ts (11 tests) 27ms
- Test Files  2 passed (2)
-      Tests  14 passed (14)
+ ✓ tests/circuit-logic.test.ts (16 tests)
+ ✓ tests/ledger-transitions.test.ts (7 tests)
+ ✓ tests/private-witness.test.ts (4 tests)
+ ✓ tests/api.test.ts (11 tests)
+ Test Files  7 passed (7)
+      Tests  38 passed (38)
 ```
 
 
@@ -175,7 +182,7 @@ Compiling 8 circuits:
 
 ## 👥 Level 5 & 6 User Validation
 
-- **Target Preprod Users**: 50 Verified Wallet Connections (See [USERS.md](file:///USERS.md))
+- **Target Preview Users**: 50 Verified Wallet Connections (See [USERS.md](file:///USERS.md))
 - **Launch Users**: 20 Verified Onboarded Users (See [LAUNCH_USERS.md](file:///LAUNCH_USERS.md))
 
 ---

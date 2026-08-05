@@ -10,7 +10,7 @@
 - [x] Privacy-First Marketplace (Browse, filter, purchase private shares with ZK proof generation).
 - [x] Investor Dashboard (Private portfolio view, ownership verification via `disclose()`, transaction history).
 - [x] Creator Dashboard (Offering management, analytics, total raised, holder stats).
-- [x] Feedback & Analytics Engine (Preprod user feedback modal, telemetry hooks).
+- [x] Feedback & Analytics Engine (Preview user feedback modal, telemetry hooks).
 - [x] CI/CD Pipeline & Automated Testing Suite.
 - [x] Complete System Documentation (`docs/` and `README.md`).
 

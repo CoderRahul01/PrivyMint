@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getOfferingByIdServerless } from '@/lib/store';
+import { db } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { offeringId, minimumShares, proofData } = body;
 
-    const offering = getOfferingByIdServerless(offeringId);
+    const offering = await db.getOfferingById(offeringId);
     if (!offering) {
       return NextResponse.json(
         { success: false, error: 'Offering not found', timestamp: new Date().toISOString() },
