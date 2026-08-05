@@ -9,9 +9,6 @@
     "deploy:preview": "npx -y tsx scripts/deploy-preview.ts",
     "test": "vitest run"
   },
-  "dependencies": {
-    "@midnight-ntwrk/midnight-js-protocol": "^0.14.0"
-  },
   "devDependencies": {
     "tsx": "^4.15.6",
     "typescript": "^5.4.5",
