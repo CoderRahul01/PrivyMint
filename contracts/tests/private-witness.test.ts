@@ -12,7 +12,7 @@
  * while guaranteeing non-exposure of investor identities, raw balances, and transaction history.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 class ZKProofGenerator {
   // Simulates client-side private witness state (kept strictly in user local memory)
